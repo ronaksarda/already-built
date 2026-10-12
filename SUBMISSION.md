@@ -84,6 +84,27 @@ It guides; it does not build the project for you, and it does not flatter. If th
   - **Multimodal value:** people often meet a rival as an app page or a tweet screenshot, not as a repo. Gemma turns that picture into text, and the report then compares the idea against that rival as well as the open-source matches.
   - **Gemma also decides safety** before any search runs: ideas meant to hurt people are refused, while defensive versions (e.g. detecting stalkerware) pass.
 
+## Demo instructions
+
+1. Clone and install:
+   ```bash
+   git clone https://github.com/ronaksarda/already-built
+   cd already-built
+   pip install -r requirements.txt
+   cp .env.example .env   # add GEMINI_API_KEY and GROQ_API_KEY (both free)
+   python scripts/prefetch.py
+   python server.py       # open http://localhost:8000
+   ```
+2. No keys? Click **Open a saved example** on the start page to see a full recorded result.
+3. Things to try:
+   - Type an idea, e.g. "An app called DupeRadar that shows open source maintainers which GitHub issues are duplicates before they triage". The project name becomes the title in the sidebar.
+   - Click **Rival screenshot** and upload a screenshot of any app's landing page: Gemma 4 describes it under "Your screenshot", and the report compares against it.
+   - Click **Speak** to dictate an idea, and **Read aloud** to hear the verdict; the dragon shows each sentence.
+   - Ask the chat "How is my idea different from P1?", then reopen the check from the sidebar: the chat is saved.
+   - Paste a GitHub repo link instead of an idea to find that repo's rivals.
+4. Agent Skill: with the server running, `python skills/already-built/scripts/check.py "your idea"`.
+5. Tests (offline, no keys): `python -m pytest -q tests`.
+
 ## Current status
 
 - **What works:**
