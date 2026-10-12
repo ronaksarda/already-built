@@ -346,6 +346,7 @@ def test_slow_gemma_is_hedged_by_groq(offline, monkeypatch):
     import time as _t
 
     monkeypatch.setattr(pipeline, "HEDGE_S", 0.2)
+    monkeypatch.setattr(pipeline, "GEMMA_GRACE_S", 0.5)
     monkeypatch.setattr(gemma, "api_key", lambda: "k")
     monkeypatch.setattr(groq, "api_key", lambda: "k")
     monkeypatch.setattr(gemma, "plan", lambda *a, **k: _t.sleep(3) or pytest.fail("too slow"))
@@ -403,3 +404,37 @@ def test_diversify_keeps_other_sources():
     low = Candidate(id="hn:2", source="hn", name="unrelated", url="u", score=0.1)
     out = rank.diversify(gh, gh + [hn, low])
     assert hn in out and low not in out and len(out) == 10
+
+
+def test_gemma_wins_when_it_answers_within_the_grace(offline, monkeypatch):
+    import time as _t
+
+    monkeypatch.setattr(pipeline, "HEDGE_S", 0.1)
+    monkeypatch.setattr(pipeline, "GEMMA_GRACE_S", 2)
+    monkeypatch.setattr(gemma, "api_key", lambda: "k")
+    monkeypatch.setattr(groq, "api_key", lambda: "k")
+
+    def slowish(*a, **k):
+        _t.sleep(0.6)
+        return {"refuse": False, "refuse_reason": "", "core_claim": "c", "problem": "", "solution": "",
+                "queries": ["slides flashcards"], "rival_description": "", "title": "", "project_name": ""}
+
+    monkeypatch.setattr(gemma, "plan", slowish)
+    monkeypatch.setattr(groq, "chat", lambda *a, **k: ('{"refuse": false, "core_claim": "c", "queries": ["x y"]}', "gpt"))
+    r = pipeline.run(IDEA)
+    assert r["query_source"] == "gemma"
+
+
+def test_report_falls_back_to_gemma_when_groq_is_down(offline, monkeypatch):
+    monkeypatch.setattr(gemma, "plan", lambda *a, **k: {"refuse": False, "refuse_reason": "", "core_claim": "c", "problem": "", "solution": "",
+                                                         "queries": ["slides flashcards"], "rival_description": "", "title": "", "project_name": ""})
+    monkeypatch.setattr(gemma, "api_key", lambda: "k")
+
+    def down(*a, **k):
+        raise groq.GroqError("Groq is unavailable right now.")
+
+    monkeypatch.setattr(groq, "chat", down)
+    monkeypatch.setattr(gemma, "chat", lambda *a, **k: ('{"overlap": [{"text": "P1 does this", "cites": ["P1"]}], "next_step": "ship"}', "gemma-4-26b-a4b-it"))
+    r = pipeline.run(IDEA)
+    assert r["models"]["report"] == "gemma-4-26b-a4b-it"
+    assert r["report"]["overlap"][0]["cites"] == ["P1"]

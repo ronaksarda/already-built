@@ -58,6 +58,7 @@ def _base(idea: str) -> dict:
 # Gemma is the planner, but when it is slow or failing the user should not wait for it.
 HEDGE_S = float(os.getenv("PLAN_HEDGE_S", "6"))  # start gpt-oss alongside Gemma after this many seconds
 PLAN_DEADLINE_S = 30
+GEMMA_GRACE_S = float(os.getenv("PLAN_GEMMA_GRACE_S", "10"))  # a ready gpt-oss plan waits this long for Gemma
 GEMMA_SKIP_AFTER = 2  # consecutive Gemma failures before it is skipped for text-only checks
 GEMMA_SKIP_S = 300
 _gemma_health = {"fails": 0, "since": 0.0}
@@ -126,9 +127,20 @@ def _plan(res: dict, idea_text: str, img) -> bool:
         hedged = not use_gemma
         if hedged and use_groq:
             futures[pool.submit(_plan_groq, idea_text)] = "groq"
-        deadline = time.time() + PLAN_DEADLINE_S
+        started = time.time()
+        deadline = started + PLAN_DEADLINE_S
+        backup = None  # a gpt-oss plan held back while Gemma may still answer
+        gemma_running = lambda: "gemma" in futures.values()  # noqa: E731
         while futures and p is None and time.time() < deadline:
-            timeout = HEDGE_S if not hedged else max(0.1, deadline - time.time())
+            grace = PLAN_DEADLINE_S if has_img else GEMMA_GRACE_S  # only Gemma can read a screenshot
+            if backup and (not gemma_running() or time.time() - started >= grace):
+                break
+            if not hedged:
+                timeout = HEDGE_S
+            elif backup:
+                timeout = max(0.05, started + (PLAN_DEADLINE_S if has_img else GEMMA_GRACE_S) - time.time())
+            else:
+                timeout = max(0.1, deadline - time.time())
             done, _ = wait(list(futures), timeout=timeout, return_when=FIRST_COMPLETED)
             if not done and not hedged:
                 hedged = True
@@ -146,10 +158,16 @@ def _plan(res: dict, idea_text: str, img) -> bool:
                             hedged = True
                             futures[pool.submit(_plan_groq, idea_text)] = "groq"
                     continue
-                if p is None:
+                if who == "gemma":
                     p = plan
                     res["models"]["plan"] = model
-                    res["query_source"] = "gemma" if who == "gemma" else f"fallback: {model}" + (f" ({plan_err})" if plan_err else "")
+                    res["query_source"] = "gemma"
+                else:
+                    backup = (plan, model)
+        if p is None and backup:
+            p, model = backup
+            res["models"]["plan"] = model
+            res["query_source"] = f"fallback: {model}" + (f" ({plan_err})" if plan_err else " (Gemma was slower than 10 s)")
     finally:
         pool.shutdown(wait=False, cancel_futures=True)  # a slow loser finishes in the background
 
@@ -183,7 +201,7 @@ def _plan(res: dict, idea_text: str, img) -> bool:
     res["project_name"] = res.get("project_name") or p.get("project_name") or ""
     res.update(core_claim=p["core_claim"], queries=combined[:6], problem=p.get("problem", ""), solution=p.get("solution", ""))
     rival = p["rival_description"]
-    if has_img and (not rival or rival.lower().startswith("unreadable")):
+    if has_img and res.get("query_source") == "gemma" and (not rival or rival.lower().startswith("unreadable")):
         res["warnings"].append("Couldn't read the screenshot. Continued with text only.")
         rival = ""
     res["rival"] = rival if has_img else ""

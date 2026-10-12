@@ -65,6 +65,25 @@ def _classify(e: Exception) -> GemmaError:
     return GemmaError(f"Gemini call failed ({type(e).__name__}).")
 
 
+# Gemma 4 thinks at length by default, which pushed a plan past 20 s. The task is extraction,
+# so minimal thinking is enough: about 5 s per plan. Set GEMMA_THINKING=default to turn this off.
+THINKING = os.getenv("GEMMA_THINKING", "minimal").strip().lower()
+_no_thinking_cfg: set[str] = set()  # models that rejected the thinking setting
+
+
+def _generate(client, types, model: str, parts: list, temperature: float):
+    base = dict(temperature=temperature, max_output_tokens=2048)
+    if THINKING and THINKING != "default" and model not in _no_thinking_cfg:
+        try:
+            cfg = types.GenerateContentConfig(**base, thinking_config=types.ThinkingConfig(thinking_level=THINKING))
+            return client.models.generate_content(model=model, contents=parts, config=cfg)
+        except Exception as e:
+            if "INVALID_ARGUMENT" not in str(e) and "thinking" not in str(e).lower():
+                raise
+            _no_thinking_cfg.add(model)  # this model doesn't take the setting: ask again without it
+    return client.models.generate_content(model=model, contents=parts, config=types.GenerateContentConfig(**base))
+
+
 def _call(parts: list, temperature: float = 0.2) -> str:
     global last_model
     from google.genai import types
@@ -77,11 +96,7 @@ def _call(parts: list, temperature: float = 0.2) -> str:
     models = [m for m in GEMMA_MODELS if now - _benched.get(m, 0) > BENCH_S] or GEMMA_MODELS
     for model in models:
         try:
-            resp = client.models.generate_content(
-                model=model,
-                contents=parts,
-                config=types.GenerateContentConfig(temperature=temperature, max_output_tokens=2048),
-            )
+            resp = _generate(client, types, model, parts, temperature)
         except Exception as e:  # the SDK raises several types; classify by message
             err = _classify(e)
             if "API key" in str(err):
@@ -229,3 +244,12 @@ def plan(idea: str, image: bytes | None = None, mime: str | None = None) -> dict
         except (ValueError, json.JSONDecodeError) as e:
             last_err = e
     raise ValueError(f"Gemma returned bad JSON twice ({last_err}).")
+
+
+def chat(messages: list[dict], temperature: float = 0.4) -> tuple[str, str]:
+    """Plain-text answer from Gemma for an OpenAI-style message list. Used when gpt-oss is unavailable."""
+    system = "\n\n".join(m["content"] for m in messages if m.get("role") == "system")
+    turns = "\n\n".join(f"{'Assistant' if m.get('role') == 'assistant' else 'User'}: {m.get('content', '')}"
+                        for m in messages if m.get("role") != "system")
+    prompt = (f"{system}\n\n" if system else "") + f"{turns}\n\nAssistant:"
+    return _call([prompt], temperature=temperature), last_model

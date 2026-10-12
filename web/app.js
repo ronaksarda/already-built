@@ -92,13 +92,13 @@
       $("status").classList.add("warn");
     }
   }
-  const chatOn = () => !state.health || state.health.groq;
+  const chatOn = () => !state.health || state.health.chat !== false && (state.health.chat || state.health.groq);
   function applyChatAvailability() {
     const on = chatOn();
     $("chatSend").disabled = !on || state.chatBusy;
     $("chatInput").disabled = !on;
     $("chatMic").disabled = !on;
-    $("chatInput").placeholder = on ? "Ask about a niche, MVP scope, or a gap…" : "The advisor needs GROQ_API_KEY on the server.";
+    $("chatInput").placeholder = on ? "Ask about a niche, MVP scope, or a gap…" : "The advisor needs GROQ_API_KEY or GEMINI_API_KEY on the server.";
     $("suggest").querySelectorAll("button").forEach((b) => { b.disabled = !on; });
   }
 
@@ -497,7 +497,12 @@
     const found = c.by_source || {};
     const inTop = (keys) => top.filter((p) => keys.some((k) => (p.source || "").startsWith(k))).length;
     const mix = [["GitHub", ["github"], "github"], ["Hugging Face", ["hf"], "hf"], ["Show HN", ["hn"], "hn"]]
-      .map(([label, keys, k]) => `${label} ${inTop(keys)} shown of ${found[k] ?? "?"} found`);
+      .filter(([label, keys, k]) => inTop(keys) > 0 || (typeof found[k] === "number" && found[k] > 0))
+      .map(([label, keys, k]) => {
+        const shown = inTop(keys);
+        const total = typeof found[k] === "number" ? found[k] : null;
+        return total !== null ? `${label} (${shown}/${total})` : `${label} (${shown})`;
+      });
     $("rowsNote").dataset.mix = mix.join(" · ");
     if (!top.length) {
       fill($("rows"), el("li", { class: "empty", text: (res.partial || []).length
@@ -527,7 +532,8 @@
             flags)),
         el("div", { class: "sim", title: `Similarity ${score.toFixed(2)} (0 to 1)` }, blocks(score, p.quadrant === "rival"), el("small", { text: `${score.toFixed(2)} similar` })));
     }));
-    $("rowsNote").textContent = ($("rowsNote").dataset.mix ? $("rowsNote").dataset.mix + ". " : "") + "Similarity is a text match between your idea and each project's description and README, from 0 to 1. Under 0.35 counts as unrelated and is hidden. It measures overlap in wording and purpose, not how good a project is.";
+    const mixPrefix = $("rowsNote").dataset.mix ? `${$("rowsNote").dataset.mix} · ` : "";
+    $("rowsNote").textContent = `${mixPrefix}Ranked by semantic match (0 to 1). Scores under 0.35 are filtered out as unrelated.`;
   }
 
   // Quadrant chart: x = same users and problem, y = same features and approach. Both are real scores.
@@ -558,8 +564,31 @@
       ticks.push(svg("text", { x: L - 8, y: sy(r) + 3, class: "tick", "text-anchor": "end", text: r.toFixed(1) }));
     }
     const others = pts.filter((p) => p.kind !== "top").map((p) => svg("circle", { cx: sx(p.x), cy: sy(p.y), r: 3, class: "pt-other" }));
+    const placedLabels = [];
     const dots = tops.sort((a, b) => a.score - b.score).map((p) => {
-      const right = sx(p.x) < W - 60;
+      const px = sx(p.x);
+      const py = sy(p.y);
+      let lx = px + 10;
+      let ly = py + 4;
+      let anchor = "start";
+      if (px >= W - 60) {
+        lx = px - 10;
+        anchor = "end";
+      }
+      const collides = placedLabels.some((pos) => Math.hypot(pos.x - lx, pos.y - ly) < 22);
+      if (collides) {
+        if (py > T + 30) {
+          lx = px;
+          ly = py - 11;
+          anchor = "middle";
+        } else {
+          lx = px;
+          ly = py + 18;
+          anchor = "middle";
+        }
+      }
+      placedLabels.push({ x: lx, y: ly });
+
       return svg("g", {
         class: p.quadrant === "rival" ? "pt rival" : "pt", tabindex: "0", role: "link",
         "aria-label": `${p.pid} ${p.name}: ${QUAD[p.quadrant] || ""}. Problem match ${p.x.toFixed(2)}, approach match ${p.y.toFixed(2)}.`,
@@ -568,8 +597,8 @@
         onclick: () => window.open(safeUrl(p.url), "_blank", "noopener"),
         onkeydown: (e) => { if (e.key === "Enter") window.open(safeUrl(p.url), "_blank", "noopener"); },
       },
-      svg("circle", { cx: sx(p.x), cy: sy(p.y), r: 6 }),
-      svg("text", { x: sx(p.x) + (right ? 10 : -10), y: sy(p.y) + 4, "text-anchor": right ? "start" : "end", text: p.pid }));
+      svg("circle", { cx: px, cy: py, r: 6 }),
+      svg("text", { x: lx, y: ly, "text-anchor": anchor, text: p.pid }));
     });
 
     const chart = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `Chart of ${tops.length} close projects by problem match and approach match.` },
@@ -998,7 +1027,7 @@
   async function sendChat(text) {
     const q = (text || "").trim();
     if (!q || state.chatBusy || !state.result) return;
-    if (!chatOn()) return addMsg("err", "The advisor needs GROQ_API_KEY on the server.");
+    if (!chatOn()) return addMsg("err", "The advisor needs GROQ_API_KEY or GEMINI_API_KEY on the server.");
     const result = state.result;
     state.chatBusy = true;
     $("chatForm").setAttribute("aria-busy", "true");

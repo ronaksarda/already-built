@@ -178,6 +178,7 @@ def health() -> dict:
     return {
         "gemma": bool(gemma.api_key()),
         "groq": bool(groq.api_key()),
+        "chat": bool(groq.api_key() or gemma.api_key()),  # gpt-oss first, Gemma 4 as the fallback
         "github_token": bool(os.getenv("GITHUB_TOKEN")),
         "embed_ready": embed_state["ready"],
         "safety_version": pipeline.SAFETY_VERSION,
@@ -253,7 +254,7 @@ def chat(request: Request, body: ChatIn) -> dict:
     try:
         text, model = report.chat_reply(res, [m.model_dump() for m in body.messages])
     except groq.GroqNoKey:
-        raise HTTPException(503, "Chat needs GROQ_API_KEY in .env.")
+        raise HTTPException(503, "Chat needs GROQ_API_KEY or GEMINI_API_KEY in .env.")
     except groq.GroqError as e:
         raise HTTPException(503, str(e))
     except (TypeError, ValueError, KeyError, AttributeError):

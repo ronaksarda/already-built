@@ -1,6 +1,6 @@
 # Already Built?
 
-> Found an open-source project like yours and want to quit? Describe your product idea by typing or speaking it. **Already Built?** searches GitHub, Hugging Face Spaces & Models, and Hacker News (Show HN), performs local semantic vector ranking using open-weight embedding models, maps your competitors onto a 2D market quadrant, and generates a grounded competitive breakdown detailing the exact gaps you can still own.
+> Found an open-source project like yours and want to quit? Describe your product idea by typing or speaking it. **Already Built?** searches GitHub, Hugging Face Spaces & Models, and Hacker News (Show HN), performs local semantic vector ranking using open-weight embedding models, maps your competitors onto a 2D market quadrant, and generates a grounded competitive breakdown of what exists and which gaps existing projects leave open.
 
 It guides your product positioning and MVP validation. It does not blindly generate code or glaze your project.
 
@@ -8,6 +8,8 @@ It guides your product positioning and MVP validation. It does not blindly gener
 
 ## Table of Contents
 
+- [Hackathon Challenges: Gemma 4 & Open-Source AI](#hackathon-challenges-gemma-4--open-source-ai)
+- [Agent Skill](#agent-skill)
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
@@ -39,6 +41,32 @@ It guides your product positioning and MVP validation. It does not blindly gener
 - [License](#license)
 
 ---
+
+## Hackathon Challenges: Gemma 4 & Open-Source AI
+
+Full submission answers: [SUBMISSION.md](SUBMISSION.md).
+
+**Where Gemma 4 works** (`gemma-4-26b-a4b-it` via the Gemini API, `google-genai` SDK; `gemma-4-31b-it` as a second model):
+
+| Job | What Gemma 4 does | Code |
+|---|---|---|
+| Plan every check | Reads the idea and writes the core claim, the problem and solution sentences (the two chart axes), 3-5 search queries, a short title, and the project name only if the user stated one | [`core/gemma.py` `plan()`](core/gemma.py), [`core/pipeline.py` `_plan()`](core/pipeline.py) |
+| Multimodal: read a rival | Reads an uploaded screenshot of a competitor's product and describes what it does; that description goes into the report | [`core/gemma.py` `plan()`](core/gemma.py) |
+| Safety | Refuses ideas meant to harm people, before any search runs | [`PLAN_PROMPT`](core/gemma.py) |
+| Backup writer | Writes the report and answers the chat when gpt-oss on Groq is down | [`core/report.py` `llm()`](core/report.py), [`core/gemma.py` `chat()`](core/gemma.py) |
+
+Gemma 4 runs with `thinking_level="minimal"`: a plan takes about 5-9 s instead of timing out at 20 s. Gemma always gets the first try; a gpt-oss plan is held back for up to 10 s so Gemma wins whenever it answers, and with a screenshot attached Gemma gets its full time because only it can read images.
+
+**Open-weight / open-source AI in the loop**: Gemma 4 (planning, vision, safety), `openai/gpt-oss-120b` / `gpt-oss-20b` (report and chat on Groq), `sentence-transformers/all-MiniLM-L6-v2` (runs locally and is the only thing that decides similarity), `whisper-large-v3-turbo` (speech to text). MIT licensed.
+
+## Agent Skill
+
+[`skills/already-built/`](skills/already-built/SKILL.md) is an [Agent Skills](https://agentskills.io) package: a `SKILL.md` with `name` and `description` frontmatter and a standard-library script. An agent that loads it can check an idea for a user:
+
+```bash
+python skills/already-built/scripts/check.py "An app that turns lecture slides into flashcards for medical students"
+python skills/already-built/scripts/check.py "..." --image rival.png --json --url http://localhost:8000
+```
 
 ## Key Features
 
@@ -497,6 +525,9 @@ Configure these settings in `.env`:
 | `MAX_PARALLEL_CHECKS`| Integer | `2` | Maximum concurrent analysis jobs executing at once. |
 | `MAX_WAITING_CHECKS` | Integer | `20` | Queue depth limit before server rejects requests with 503 Busy. |
 | `GEMMA_TIMEOUT_MS` | Integer | `20000` | Timeout in ms for Gemma planning before falling back to Groq. |
+| `GEMMA_THINKING` | String | `minimal` | Gemma 4 thinking level. `default` turns the setting off (much slower plans). |
+| `PLAN_HEDGE_S` | Float | `6` | Seconds before gpt-oss starts planning alongside Gemma. |
+| `PLAN_GEMMA_GRACE_S` | Float | `10` | How long a finished gpt-oss plan waits for Gemma before it is used. |
 
 ---
 

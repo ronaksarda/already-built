@@ -56,9 +56,11 @@ def test_clean_prompt_and_chat_boxes():
         for required_id in [
             "idea", "micBtn", "micLabel", "shot", "shotLabel", "shotClear",
             "sttLang", "count", "checkBtn", "hint", "demoBtn",
-            "chatInput", "chatMic", "chatSend", "mapBlock", "map"
+            "chatInput", "chatMic", "chatSend", "mapBlock", "map", "mapLegend"
         ]:
             assert f'id="{required_id}"' in html, f"Missing id: {required_id}"
+        assert "Direct rivals (P1–P10)" in html
+        assert "Closest projects (P1–P10)" in html
 
 
 def test_github_repo_url_detection():

@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import re
 
-from . import groq
+from . import gemma, groq
 from .gemma import extract_json
 from .sources import Candidate
 
@@ -132,6 +132,19 @@ def validate_report(d: dict, idmap: dict) -> dict:
     return out
 
 
+def llm(messages: list[dict], temperature: float, max_tokens: int = 1400, json_mode: bool = False) -> tuple[str, str]:
+    """gpt-oss on Groq first, Gemma 4 when Groq is down or has no key. Raises GroqError if both fail."""
+    try:
+        return groq.chat(messages, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
+    except groq.GroqError as first:
+        if not gemma.api_key():
+            raise
+        try:
+            return gemma.chat(messages, temperature=temperature)
+        except gemma.GemmaError as e:
+            raise groq.GroqError(f"{first} Gemma fallback failed too ({e}).") from e
+
+
 def llm_report(idea: str, claim: str, cands: list[Candidate], rival: str = "") -> dict:
     projects, idmap = project_block(cands)
     rival_block = f"<rival>\nScreenshot of a rival the user found: {rival}\n</rival>" if rival else ""
@@ -139,7 +152,7 @@ def llm_report(idea: str, claim: str, cands: list[Candidate], rival: str = "") -
                                   projects=projects or "(empty: no similar projects found)")
     last: Exception | None = None
     for _ in range(2):
-        text, model = groq.chat([{"role": "user", "content": prompt}], temperature=0.3, json_mode=True)
+        text, model = llm([{"role": "user", "content": prompt}], temperature=0.3, json_mode=True)
         try:
             data = extract_json(text)
             if isinstance(data, dict) and data.get("refuse") is True:
@@ -213,4 +226,4 @@ def chat_reply(res: dict, history: list[dict]) -> tuple[str, str]:
     for m in history[-12:]:
         role = "assistant" if m.get("role") == "assistant" else "user"
         msgs.append({"role": role, "content": str(m.get("content", ""))[:2000]})
-    return groq.chat(msgs, temperature=0.5, max_tokens=900)
+    return llm(msgs, temperature=0.5, max_tokens=900)
