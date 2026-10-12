@@ -1,0 +1,627 @@
+{
+ "safety_version": 4,
+ "status": "ok",
+ "message": "",
+ "idea": "An app that turns lecture slides into spaced-repetition flashcards for medical students.",
+ "core_claim": "It creates spaced-repetition flashcards from lecture slides for medical students.",
+ "queries": [
+  "lecture slides spaced",
+  "lecture slide flashcards",
+  "spaced repetition medical",
+  "slide to flashcard generator",
+  "flashcards medical students",
+  "lecture medical students"
+ ],
+ "query_source": "fallback: openai/gpt-oss-120b",
+ "rival": "",
+ "warnings": [],
+ "errors": [],
+ "top": [
+  {
+   "id": "github:SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "source": "github",
+   "name": "SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "url": "https://github.com/SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "description": "AI-generated app: 40\u4ee5\u4e0a\u306e\u533b\u7642\u30fb\u89e3\u5256\u5b66\u7528\u8a9e\u3092SM-2\u30a2\u30eb\u30b4\u30ea\u30ba\u30e0\u306b\u57fa\u3065\u304f\u30b9\u30da\u30fc\u30b9\u30c9\u30fb\u30ea\u30d4\u30c6\u30a3\u30b7\u30e7\u30f3\u65b9\u5f0f\u3067\u5b66\u7fd2\u3067\u304d\u308b\u30d5\u30e9\u30c3\u30b7\u30e5\u30ab\u30fc\u30c9\u30a2\u30d7\u30ea\u3002 (zerohuman-labs daily 2026-09-14)",
+   "topics": [],
+   "readme": "40\u4ee5\u4e0a\u306e\u533b\u7642\u30fb\u89e3\u5256\u5b66\u7528\u8a9e\u3092SM-2\u30a2\u30eb\u30b4\u30ea\u30ba\u30e0\u306b\u57fa\u3065\u304f\u30b9\u30da\u30fc\u30b9\u30c9\u30fb\u30ea\u30d4\u30c6\u30a3\u30b7\u30e7\u30f3\u65b9\u5f0f\u3067\u5b66\u7fd2\u3067\u304d\u308b\u30d5\u30e9\u30c3\u30b7\u30e5\u30ab\u30fc\u30c9\u30a2\u30d7\u30ea\u3002",
+   "stars": 0,
+   "updated_at": "2026-09-13T18:42:09Z",
+   "archived": false,
+   "fork": false,
+   "language": "HTML",
+   "score": 0.7291291952133179,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "same-build"
+  },
+  {
+   "id": "github:sidcommits/flashcards-medical",
+   "source": "github",
+   "name": "sidcommits/flashcards-medical",
+   "url": "https://github.com/sidcommits/flashcards-medical",
+   "description": "CSV-driven spaced-repetition flashcards (Next.js static export) \u2014 flashcards.webkraft.work",
+   "topics": [],
+   "readme": "# Flashcards An Anki-style spaced-repetition flashcard site whose source of truth is plain CSV spreadsheets . Add cards by editing CSVs in Excel / Numbers / Google Sheets \u2014 one row per card. The app reads those CSVs in the browser at runtime, so adding a row and refreshing shows the new card. No database, no backend, no auth. Exports to a fully static site. Cards are organized as Subject \u2192 Deck \u2192 Topic \u2192 Card . Study works like Anki: flip a card, self-grade recall (Again / Hard / Good / Easy), and a spaced-repetition scheduler picks what's due. Progress persists in `localStorage`. Quick start Adding cards 1. Open `public/decks/obgyn.csv` (or a new subject file) in Excel / Numbers / Sheets. 2. Add rows with this exact header, columns in order: An optional 6th column `hint` is supported (a small toggle-able hint on the card front). 3. Save / export as CSV UTF-8 . 4. New subject? Save a new file like `pharmacology.csv` with the same header, drop it in `public/decks/`. Optionally add a color entry to `public/decks/manifest.json`. 5. `npm run dev` \u2014 the index script runs automatically. Adding rows to an *existing* file just needs a browser refresh; adding a *new* file needs the dev server to re-run the index step (restart `npm run dev`). CSV rules - One row = one card. Comma-separated; fields with commas/quotes/newlines must be double-quoted (spreadsheets do this automatically on export). - UTF-8 \u2014 characters like `\u00b0 \u2192 \u2191 \u2193 \u03b2 \u03b1` are preserved. Multi-line answers (quoted) render the",
+   "stars": 0,
+   "updated_at": "2026-07-29T19:06:18Z",
+   "archived": false,
+   "fork": false,
+   "language": "TypeScript",
+   "score": 0.6738569736480713,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "rival"
+  },
+  {
+   "id": "github:aardgn/Medonie",
+   "source": "github",
+   "name": "aardgn/Medonie",
+   "url": "https://github.com/aardgn/Medonie",
+   "description": "An AI-powered spaced repetition flashcard app for medical students",
+   "topics": [],
+   "readme": "# Medonie > Project status: Active development > > Medonie is an unfinished project that I am actively building and refining. The core study workflow works, but the application is not production-ready and several features, migrations, and operational safeguards are still in progress. Overview Medonie is a spaced-repetition flashcard application for medical students. A user can upload PDF or image-based lecture notes, generate flashcards with Google Gemini, organize them into decks, and review due cards through a custom scheduling algorithm. The goal is to reduce the manual work of creating study material while keeping review timing deterministic and testable. Tech Stack - Next.js and TypeScript for the current web application, using the App Router, server-side data loading, API routes, and focused client components for interactive review sessions. - Supabase for PostgreSQL storage, Google OAuth authentication, and Row Level Security policies that isolate each user's cards and review data. - Google Gemini API for multimodal flashcard generation from PDF, PNG, and JPEG uploads. The API key remains server-side in the Next.js generation route. - Tailwind CSS for the responsive desktop and mobile interfaces. - Python and Streamlit in the earlier prototype. The project is being migrated incrementally from that prototype to Next.js; the Python SRS implementation remains a behavioral reference for the TypeScript port. Feature Status Working now - Google OAuth authentication through S",
+   "stars": 0,
+   "updated_at": "2026-09-05T08:16:09Z",
+   "archived": false,
+   "fork": false,
+   "language": "TypeScript",
+   "score": 0.6663755178451538,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "rival"
+  },
+  {
+   "id": "github:mack2112/medical-flashcards-pro",
+   "source": "github",
+   "name": "mack2112/medical-flashcards-pro",
+   "url": "https://github.com/mack2112/medical-flashcards-pro",
+   "description": "Premium Medical Terminology Flashcards for Nursing Students - AI-powered spaced repetition, NCLEX prep, and gamified learning",
+   "topics": [],
+   "readme": "# medical-flashcards-pro Premium Medical Terminology Flashcards for Nursing Students - AI-powered spaced repetition, NCLEX prep, and gamified learning",
+   "stars": 0,
+   "updated_at": "2025-09-28T09:54:56Z",
+   "archived": false,
+   "fork": false,
+   "language": "HTML",
+   "score": 0.6325169801712036,
+   "low_confidence": false,
+   "stale": true,
+   "quadrant": "loose"
+  },
+  {
+   "id": "github:skygoose/lecture_to_flashcard",
+   "source": "github",
+   "name": "skygoose/lecture_to_flashcard",
+   "url": "https://github.com/skygoose/lecture_to_flashcard",
+   "description": "Turn pdf lecture slides into flashcards",
+   "topics": [],
+   "readme": "# lecture_to_flashcard Turn pdf lecture slides into flashcards",
+   "stars": 0,
+   "updated_at": "2025-12-04T07:27:42Z",
+   "archived": false,
+   "fork": false,
+   "language": "",
+   "score": 0.6261578798294067,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "rival"
+  },
+  {
+   "id": "github:Sillybob123/recallis",
+   "source": "github",
+   "name": "Sillybob123/recallis",
+   "url": "https://github.com/Sillybob123/recallis",
+   "description": "Recallis \u2014 flashcards, cloze deletion, and Anki-style image occlusion with FSRS spaced repetition. Built for medical school. recallis.org",
+   "topics": [],
+   "readme": "",
+   "stars": 0,
+   "updated_at": "2026-08-24T11:29:46Z",
+   "archived": false,
+   "fork": false,
+   "language": "TypeScript",
+   "score": 0.6127007007598877,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "same-build"
+  },
+  {
+   "id": "github:galile07/MedPrep",
+   "source": "github",
+   "name": "galile07/MedPrep",
+   "url": "https://github.com/galile07/MedPrep",
+   "description": "A flashcard app for students in medical field",
+   "topics": [],
+   "readme": "",
+   "stars": 0,
+   "updated_at": "2025-10-22T12:39:19Z",
+   "archived": false,
+   "fork": false,
+   "language": "HTML",
+   "score": 0.608289361000061,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "rival"
+  },
+  {
+   "id": "hn:38601386",
+   "source": "hn",
+   "name": "Memorize Anything with Krizmi",
+   "url": "https://news.ycombinator.com/item?id=38601386",
+   "description": "Hey everyone, Introducing Krizmi (https://krizmi.com/) - AI software for easy memorization using spaced repetition. Whether you're prepping for exams or diving into any study material, Krizmi lets you upload your documents and effortlessly generate automatic flashcards from any selected text. These flashcards are then presented at optimal intervals to enhance memory retention on any topic. The pro",
+   "topics": [],
+   "readme": "",
+   "stars": 4,
+   "updated_at": "2023-12-11T15:21:19Z",
+   "archived": false,
+   "fork": false,
+   "language": "",
+   "score": 0.56653892993927,
+   "low_confidence": false,
+   "stale": false,
+   "quadrant": "same-build"
+  },
+  {
+   "id": "hf-space:nithish27022003/AI-Flashcard-Generator",
+   "source": "hf-space",
+   "name": "nithish27022003/AI-Flashcard-Generator",
+   "url": "https://huggingface.co/spaces/nithish27022003/AI-Flashcard-Generator",
+   "description": "AI Flashcard Generator for Study Material",
+   "topics": [
+    "gradio"
+   ],
+   "readme": "",
+   "stars": 1,
+   "updated_at": "2025-06-06T10:10:23.000Z",
+   "archived": false,
+   "fork": false,
+   "language": "",
+   "score": 0.47447413206100464,
+   "low_confidence": false,
+   "stale": true,
+   "quadrant": "same-build"
+  },
+  {
+   "id": "hf-model:AyoubChaouki/Flashcard_generator",
+   "source": "hf-model",
+   "name": "AyoubChaouki/Flashcard_generator",
+   "url": "https://huggingface.co/AyoubChaouki/Flashcard_generator",
+   "description": "",
+   "topics": [],
+   "readme": "",
+   "stars": 0,
+   "updated_at": "2024-10-26T11:14:51.000Z",
+   "archived": false,
+   "fork": false,
+   "language": "",
+   "score": 0.44799309968948364,
+   "low_confidence": true,
+   "stale": true,
+   "quadrant": "same-build"
+  }
+ ],
+ "map": [
+  {
+   "x": 0.48,
+   "y": 0.586,
+   "name": "aardgn/Medonie",
+   "url": "https://github.com/aardgn/Medonie",
+   "source": "github",
+   "score": 0.666,
+   "pid": "P3",
+   "kind": "top",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.437,
+   "y": 0.62,
+   "name": "SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "url": "https://github.com/SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "source": "github",
+   "score": 0.729,
+   "pid": "P1",
+   "kind": "top",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.588,
+   "y": 0.604,
+   "name": "vibemill-apps/slides-to-cards",
+   "url": "https://github.com/vibemill-apps/slides-to-cards",
+   "source": "github",
+   "score": 0.584,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.449,
+   "y": 0.416,
+   "name": "mack2112/medical-flashcards-pro",
+   "url": "https://github.com/mack2112/medical-flashcards-pro",
+   "source": "github",
+   "score": 0.633,
+   "pid": "P4",
+   "kind": "top",
+   "quadrant": "loose"
+  },
+  {
+   "x": 0.371,
+   "y": 0.456,
+   "name": "Omochikun55/MedStudy-Spaced-Repetition",
+   "url": "https://github.com/Omochikun55/MedStudy-Spaced-Repetition",
+   "source": "github",
+   "score": 0.586,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.465,
+   "y": 0.395,
+   "name": "specter456/glassmed-learn",
+   "url": "https://github.com/specter456/glassmed-learn",
+   "source": "github",
+   "score": 0.554,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-problem"
+  },
+  {
+   "x": 0.457,
+   "y": 0.569,
+   "name": "priyanshu07rai/FlashDeck-AI-Instant-Spaced-Repetition-Study-Cards",
+   "url": "https://github.com/priyanshu07rai/FlashDeck-AI-Instant-Spaced-Repetition-Study-Cards",
+   "source": "github",
+   "score": 0.507,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.715,
+   "y": 0.546,
+   "name": "skygoose/lecture_to_flashcard",
+   "url": "https://github.com/skygoose/lecture_to_flashcard",
+   "source": "github",
+   "score": 0.626,
+   "pid": "P5",
+   "kind": "top",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.554,
+   "y": 0.581,
+   "name": "sidcommits/flashcards-medical",
+   "url": "https://github.com/sidcommits/flashcards-medical",
+   "source": "github",
+   "score": 0.674,
+   "pid": "P2",
+   "kind": "top",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.517,
+   "y": 0.464,
+   "name": "Dichora2/Medi-flash",
+   "url": "https://github.com/Dichora2/Medi-flash",
+   "source": "github",
+   "score": 0.521,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.356,
+   "y": 0.332,
+   "name": "Redger1/MedNotes",
+   "url": "https://github.com/Redger1/MedNotes",
+   "source": "github",
+   "score": 0.388,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "loose"
+  },
+  {
+   "x": 0.442,
+   "y": 0.469,
+   "name": "Sillybob123/recallis",
+   "url": "https://github.com/Sillybob123/recallis",
+   "source": "github",
+   "score": 0.613,
+   "pid": "P6",
+   "kind": "top",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.611,
+   "y": 0.452,
+   "name": "galile07/MedPrep",
+   "url": "https://github.com/galile07/MedPrep",
+   "source": "github",
+   "score": 0.608,
+   "pid": "P7",
+   "kind": "top",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.438,
+   "y": 0.28,
+   "name": "mack2112/medflash-pro",
+   "url": "https://github.com/mack2112/medflash-pro",
+   "source": "github",
+   "score": 0.428,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "loose"
+  },
+  {
+   "x": 0.594,
+   "y": 0.499,
+   "name": "Mano-21-maker/medical-flashcard-app",
+   "url": "https://github.com/Mano-21-maker/medical-flashcard-app",
+   "source": "github",
+   "score": 0.607,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.466,
+   "y": 0.563,
+   "name": "vibemill-apps/slides-to-flashcards",
+   "url": "https://github.com/vibemill-apps/slides-to-flashcards",
+   "source": "github",
+   "score": 0.425,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.523,
+   "y": 0.466,
+   "name": "miguellenzi472-cloud/Medicine-Study-Materials-with-Claude",
+   "url": "https://github.com/miguellenzi472-cloud/Medicine-Study-Materials-with-Claude",
+   "source": "github",
+   "score": 0.483,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.584,
+   "y": 0.515,
+   "name": "PykeE12/FlashcardPractice",
+   "url": "https://github.com/PykeE12/FlashcardPractice",
+   "source": "github",
+   "score": 0.592,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.578,
+   "y": 0.444,
+   "name": "galile07/MedPrep_app",
+   "url": "https://github.com/galile07/MedPrep_app",
+   "source": "github",
+   "score": 0.591,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-problem"
+  },
+  {
+   "x": 0.471,
+   "y": 0.434,
+   "name": "jacoblum22/MyStudyMate",
+   "url": "https://github.com/jacoblum22/MyStudyMate",
+   "source": "github",
+   "score": 0.443,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-problem"
+  },
+  {
+   "x": 0.388,
+   "y": 0.268,
+   "name": "kjubik/med-memo",
+   "url": "https://github.com/kjubik/med-memo",
+   "source": "github",
+   "score": 0.337,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "loose"
+  },
+  {
+   "x": 0.633,
+   "y": 0.587,
+   "name": "Apau247/slidesage",
+   "url": "https://github.com/Apau247/slidesage",
+   "source": "github",
+   "score": 0.573,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.448,
+   "y": 0.555,
+   "name": "Memorize Anything with Krizmi",
+   "url": "https://news.ycombinator.com/item?id=38601386",
+   "source": "hn",
+   "score": 0.567,
+   "pid": "P8",
+   "kind": "top",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.364,
+   "y": 0.452,
+   "name": "Sah-Akash/ContextCard.ai",
+   "url": "https://github.com/Sah-Akash/ContextCard.ai",
+   "source": "github",
+   "score": 0.434,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.662,
+   "y": 0.49,
+   "name": "elihaff/Lecture-Revision-Tool",
+   "url": "https://github.com/elihaff/Lecture-Revision-Tool",
+   "source": "github",
+   "score": 0.562,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "rival"
+  },
+  {
+   "x": 0.375,
+   "y": 0.517,
+   "name": "kar-kit/MemoAI",
+   "url": "https://github.com/kar-kit/MemoAI",
+   "source": "github",
+   "score": 0.558,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.435,
+   "y": 0.401,
+   "name": "daanmt/MedHub",
+   "url": "https://github.com/daanmt/MedHub",
+   "source": "github",
+   "score": 0.558,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "loose"
+  },
+  {
+   "x": 0.568,
+   "y": 0.399,
+   "name": "pasttrunks/lecturepack",
+   "url": "https://github.com/pasttrunks/lecturepack",
+   "source": "github",
+   "score": 0.558,
+   "pid": "",
+   "kind": "other",
+   "quadrant": "same-problem"
+  },
+  {
+   "x": 0.42,
+   "y": 0.574,
+   "name": "nithish27022003/AI-Flashcard-Generator",
+   "url": "https://huggingface.co/spaces/nithish27022003/AI-Flashcard-Generator",
+   "source": "hf-space",
+   "score": 0.474,
+   "pid": "P9",
+   "kind": "top",
+   "quadrant": "same-build"
+  },
+  {
+   "x": 0.404,
+   "y": 0.579,
+   "name": "AyoubChaouki/Flashcard_generator",
+   "url": "https://huggingface.co/AyoubChaouki/Flashcard_generator",
+   "source": "hf-model",
+   "score": 0.448,
+   "pid": "P10",
+   "kind": "top",
+   "quadrant": "same-build"
+  }
+ ],
+ "verdict": {
+  "level": "crowded",
+  "title": "Done before in open source",
+  "text": "4 projects target the same problem space with existing code, but they are small or inactive. You must build an explicit differentiator to stand out."
+ },
+ "report": {
+  "dropped_citations": 0,
+  "overlap": [
+   {
+    "text": "Several existing projects already generate spaced\u2011repetition flashcards for medical study material, often from CSVs or PDFs",
+    "cites": [
+     "P1",
+     "P2",
+     "P3",
+     "P5",
+     "P6",
+     "P7",
+     "P8"
+    ]
+   }
+  ],
+  "differs": [],
+  "gaps": [
+   {
+    "text": "P5 only converts PDF slides to flashcards and lacks a spaced\u2011repetition scheduler",
+    "cites": [
+     "P5"
+    ]
+   },
+   {
+    "text": "P3 is unfinished and not production\u2011ready, missing stable deployment and robust UI",
+    "cites": [
+     "P3"
+    ]
+   }
+  ],
+  "avoid": [
+   {
+    "text": "The market is oversaturated with generic flashcard apps; without a unique workflow or niche audience you\u2019ll struggle to gain traction",
+    "cites": [
+     "P3"
+    ]
+   }
+  ],
+  "next_step": "Validate demand by surveying medical students about pain points in current flashcard tools",
+  "ids": {
+   "P1": "github:SuyamaCorporation/medical-anatomy-terminology-spaced-repetition-flashcard",
+   "P2": "github:sidcommits/flashcards-medical",
+   "P3": "github:aardgn/Medonie",
+   "P4": "github:mack2112/medical-flashcards-pro",
+   "P5": "github:skygoose/lecture_to_flashcard",
+   "P6": "github:Sillybob123/recallis",
+   "P7": "github:galile07/MedPrep",
+   "P8": "hn:38601386",
+   "P9": "hf-space:nithish27022003/AI-Flashcard-Generator",
+   "P10": "hf-model:AyoubChaouki/Flashcard_generator"
+  },
+  "model": "openai/gpt-oss-120b"
+ },
+ "report_note": "",
+ "counts": {
+  "fetched": 168,
+  "unique": 146,
+  "kept": 10,
+  "by_source": {
+   "github": 128,
+   "hn": 3,
+   "hf": 15
+  }
+ },
+ "partial": [],
+ "title": "Lecture Slide Flashcards",
+ "project_name": "",
+ "models": {
+  "plan": "openai/gpt-oss-120b",
+  "embed": "sentence-transformers/all-MiniLM-L6-v2",
+  "report": "openai/gpt-oss-120b"
+ },
+ "gemini_calls": 1,
+ "demo": true,
+ "timings": {
+  "plan": 7.26,
+  "fetch": 3.01,
+  "rank": 29.22,
+  "report": 2.05,
+  "total": 41.55
+ },
+ "problem": "Medical students struggle to convert lecture slides into effective study flashcards.",
+ "solution": "The app extracts content from slides and generates spaced-repetition flashcards using automated processing.",
+ "axes_from": "gemma",
+ "quadrant_split": 0.45,
+ "demo_note": "Recorded on a live run. Report by openai/gpt-oss-120b. Links and numbers are from that run, so they may have changed since."
+}
